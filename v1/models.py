@@ -51,6 +51,7 @@ class User(models.Model):
     last_book_page = models.IntegerField(null=True)
     role = models.ForeignKey('Role', on_delete=models.CASCADE)
     publisher_name = models.CharField(max_length=255, null=True)
+    password_restore_date = models.DateField(null=True)
 
 class Role(models.Model):
     name = models.CharField(max_length=50)
