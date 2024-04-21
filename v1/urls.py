@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import ActionViewSet, NotificationViewSet, AuthorViewSet, AuthorBooksViewSet, BookViewSet, GenreViewSet, UserBooksViewSet, UserViewSet, RoleViewSet
+from .views import *
 
 router = routers.DefaultRouter()
 router.register(r'actions', ActionViewSet)
@@ -15,4 +15,5 @@ router.register(r'roles', RoleViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('users/auth/<str:login>/<str:password>/', auth),
 ]
