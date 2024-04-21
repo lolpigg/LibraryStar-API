@@ -50,6 +50,7 @@ class User(models.Model):
     last_book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
     last_book_page = models.IntegerField(null=True)
     role = models.ForeignKey('Role', on_delete=models.CASCADE)
+    publisher_name = models.CharField(max_length=255, null=True)
 
 class Role(models.Model):
     name = models.CharField(max_length=50)
