@@ -12,6 +12,7 @@ class Notification(models.Model):
 
 class Author(models.Model):
     full_name = models.CharField(max_length=100)
+    image_path = models.ImageField(upload_to='img/authors/')
     year_of_birth = models.IntegerField()
     year_of_death = models.IntegerField(null=True)
     literary_direction = models.CharField(max_length=100)

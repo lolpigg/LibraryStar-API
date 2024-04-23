@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 
 from .models import Action, Notification, Author, AuthorBooks, Book, Genre, UserBooks, User, Role
@@ -16,6 +17,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
 class AuthorBooksViewSet(viewsets.ModelViewSet):
     queryset = AuthorBooks.objects.all()
@@ -24,10 +26,12 @@ class AuthorBooksViewSet(viewsets.ModelViewSet):
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
 class UserBooksViewSet(viewsets.ModelViewSet):
     queryset = UserBooks.objects.all()
@@ -36,6 +40,7 @@ class UserBooksViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    parser_classes = (MultiPartParser, FormParser)
 
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
