@@ -15,5 +15,5 @@ router.register(r'roles', RoleViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('users/auth/<str:login>/<str:password>/', auth),
+    path('users/auth/', auth),
 ]

@@ -24,8 +24,8 @@ class Book(models.Model):
     name = models.CharField(max_length=255)
     number_of_pages = models.IntegerField()
     year_of_creating = models.IntegerField()
-    image_path = models.TextField()
-    pdf_path = models.TextField()
+    image_path = models.ImageField(upload_to='img/books/')
+    pdf_path = models.FileField(upload_to='pdf/')
     publisher = models.ForeignKey('User', on_delete=models.CASCADE)
     genre = models.ForeignKey('Genre', on_delete=models.CASCADE)
     is_deleted = models.BooleanField()
@@ -34,7 +34,7 @@ class Book(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(max_length=50)
-    icon_path = models.TextField()
+    icon_path = models.ImageField(upload_to='img/genres/')
     first_color = models.CharField(max_length=7)
     second_color = models.CharField(max_length=7)
 
@@ -46,7 +46,7 @@ class User(models.Model):
     login = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     registration_date = models.DateField()
-    avatar_path = models.TextField(null=True)
+    avatar_path = models.ImageField(null=True, upload_to='img/users/')
     last_book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
     last_book_page = models.IntegerField(null=True)
     role = models.ForeignKey('Role', on_delete=models.CASCADE)

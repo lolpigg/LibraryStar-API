@@ -48,11 +48,18 @@ class RoleViewSet(viewsets.ModelViewSet):
 #             return user.id
 #     return -1
 
-@api_view(['GET'])
-def auth(request, login, password):
-    try:
-        user = User.objects.get(login=login, password=password)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-    except User.DoesNotExist:
-        return Response({'error': 'Invalid credentials'}, status=400)
+@api_view(['POST'])
+def auth(request):
+    if request.method == 'POST':
+        login = request.data.get('login')
+        password = request.data.get('password')
+        if login is None or password is None:
+            return Response({'error': 'Please provide both login and password'}, status=400)
+        try:
+            user = User.objects.get(login=login, password=password)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid credentials'}, status=400)
+    else:
+        return Response({'error': 'Only POST method is allowed'}, status=405)
