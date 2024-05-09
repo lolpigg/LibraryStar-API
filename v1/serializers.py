@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Action, Notification, Author, AuthorBooks, Book, Genre, UserBooks, User, Role
+from .models import Action, Notification, Author, AuthorBooks, Book, Genre, UserBooks, User, Role, Comment, Direction, \
+    PublisherBooks
+from drf_extra_fields.fields import Base64ImageField, Base64FileField
 
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,6 +14,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AuthorSerializer(serializers.ModelSerializer):
+    image_path = Base64ImageField()
     class Meta:
         model = Author
         fields = '__all__'
@@ -22,14 +25,19 @@ class AuthorBooksSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class BookSerializer(serializers.ModelSerializer):
+    image_path = Base64ImageField()
+    file_path = Base64FileField()
     class Meta:
         model = Book
         fields = '__all__'
 
 class GenreSerializer(serializers.ModelSerializer):
+    #icon_path = Base64ImageField()
     class Meta:
         model = Genre
         fields = '__all__'
+
+
 
 class UserBooksSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,4 +52,19 @@ class UserSerializer(serializers.ModelSerializer):
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
+        fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+class DirectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Direction
+        fields = '__all__'
+
+class PublisherBooksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublisherBooks
         fields = '__all__'

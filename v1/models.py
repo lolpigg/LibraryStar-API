@@ -7,23 +7,23 @@ class Notification(models.Model):
     description = models.CharField(max_length=1024)
     action = models.ForeignKey(Action, on_delete=models.CASCADE)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
-    is_accepted = models.BooleanField()
-    discard_text = models.CharField(max_length=1024)
+    is_accepted = models.BooleanField(null=True)
+    discard_text = models.CharField(max_length=1024, null=True)
 
 class Author(models.Model):
     full_name = models.CharField(max_length=100)
-    image_path = models.ImageField(upload_to='img/authors/')
+    image_path = models.ImageField(upload_to='img/authors/', null=True)
     year_of_birth = models.IntegerField()
     year_of_death = models.IntegerField(null=True)
-    literary_direction = models.CharField(max_length=100)
+    literary_direction = models.ForeignKey('Direction', on_delete=models.CASCADE)
 
 class AuthorBooks(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     book = models.ForeignKey('Book', on_delete=models.CASCADE)
 
 class Book(models.Model):
-    name = models.CharField(max_length=255)
-    number_of_pages = models.IntegerField()
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=300, default="Описания нет.")
     year_of_creating = models.IntegerField()
     image_path = models.ImageField(upload_to='img/books/')
     pdf_path = models.FileField(upload_to='pdf/')
@@ -35,13 +35,20 @@ class Book(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(max_length=50)
-    icon_path = models.ImageField(upload_to='img/genres/')
+    icon_path = models.ImageField(upload_to='img/genres/', null=True)
     first_color = models.CharField(max_length=7)
     second_color = models.CharField(max_length=7)
 
 class UserBooks(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey('User', on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
+class PublisherBooks(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    publisher = models.ForeignKey('User', on_delete=models.CASCADE)
+    is_active = models.BooleanField()
+
 
 class User(models.Model):
     login = models.CharField(max_length=255)
@@ -56,3 +63,15 @@ class User(models.Model):
 
 class Role(models.Model):
     name = models.CharField(max_length=50)
+
+class Comment(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    mark = models.IntegerField()
+    text = models.CharField(max_length=300, null=True)
+
+class Direction(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=255)
+    year_of_found = models.IntegerField()
+
