@@ -4,15 +4,128 @@ from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework import status
-
+from PIL import Image
 from .models import *
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+import io
+import base64
 
 class CustomPagination(PageNumberPagination):
     page_size = 2
     page_size_query_param = 'page_size'
+
+@api_view(['GET'])
+def get_users_by_role_id(request, role):
+    try:
+        users = User.objects.filter(role=role)
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_books_by_user(request, user):
+    try:
+        user_books = UserBooks.objects.filter(user=user, is_active=True)
+        books = [user_book.book for user_book in user_books]
+        book_data = []
+        for book in books:
+            book_info = {
+                'id': book.id,
+                'name': book.name,
+                'description': book.description,
+                'year_of_creating': book.year_of_creating,
+                'image_path': request.build_absolute_uri(book.image_path.url) if book.image_path else None,
+                'pdf_path': "",
+                'publisher': book.publisher.id,
+                'genre': book.genre.id,
+                'is_deleted': book.is_deleted,
+                'delete_text': book.delete_text,
+                'is_available': book.is_available
+            }
+            book_data.append(book_info)
+        return Response(book_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_books_by_author(request, author):
+    try:
+        user_books = AuthorBooks.objects.filter(author=author)
+        books = [user_book.book for user_book in user_books]
+        book_data = []
+        for book in books:
+            book_info = {
+                'id': book.id,
+                'name': book.name,
+                'description': book.description,
+                'year_of_creating': book.year_of_creating,
+                'image_path': request.build_absolute_uri(book.image_path.url) if book.image_path else None,
+                'pdf_path': "",
+                'publisher': book.publisher.id,
+                'genre': book.genre.id,
+                'is_deleted': book.is_deleted,
+                'delete_text': book.delete_text,
+                'is_available': book.is_available
+            }
+            book_data.append(book_info)
+        return Response(book_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_books_by_genre(request, genre):
+    try:
+        books = Book.objects.filter(genre=genre)
+        book_data = []
+        for book in books:
+            book_info = {
+                'id': book.id,
+                'name': book.name,
+                'description': book.description,
+                'year_of_creating': book.year_of_creating,
+                'image_path': request.build_absolute_uri(book.image_path.url) if book.image_path else None,
+                'pdf_path': "",
+                'publisher': book.publisher.id,
+                'genre': book.genre.id,
+                'is_deleted': book.is_deleted,
+                'delete_text': book.delete_text,
+                'is_available': book.is_available
+            }
+            book_data.append(book_info)
+        return Response(book_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_authors_by_book(request, book_id):
+    try:
+        # Получаем книгу по переданному ID
+        book = Book.objects.get(id=book_id)
+    except Book.DoesNotExist:
+        return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Получаем все записи AuthorBooks, связанные с этой книгой
+    author_books = AuthorBooks.objects.filter(book=book)
+
+    # Формируем список авторов
+    authors = [
+        {
+            'id': author_book.author.id,
+            'full_name': author_book.author.full_name,
+            'image_path': request.build_absolute_uri(author_book.author.image_path.url) if author_book.author.image_path else None,
+            'year_of_birth': author_book.author.year_of_birth,
+            'year_of_death': author_book.author.year_of_death,
+        }
+        for author_book in author_books
+    ]
+
+    # Возвращаем список авторов в формате JSON
+    return Response(authors, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def auth(request):
@@ -114,11 +227,8 @@ def notification_detail(request, pk):
 @api_view(['GET', 'POST'])
 def author_list_create(request):
     if request.method == 'GET':
-        paginator = CustomPagination()
         authors = Author.objects.all()
-        result_page = paginator.paginate_queryset(authors, request)
-        serializer = AuthorSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        serializer = AuthorSerializer(authors, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
@@ -195,11 +305,24 @@ def authorbooks_detail(request, pk):
 @api_view(['GET', 'POST'])
 def books_list_create(request):
     if request.method == 'GET':
-        paginator = CustomPagination()
         books = Book.objects.all()
-        result_page = paginator.paginate_queryset(books, request)
-        serializer = BookSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        book_data = []
+        for book in books:
+            book_info = {
+                'id': book.id,
+                'name': book.name,
+                'description': book.description,
+                'year_of_creating': book.year_of_creating,
+                'image_path': request.build_absolute_uri(book.image_path.url) if book.image_path else None,
+                'pdf_path': "",
+                'publisher': book.publisher.id,
+                'genre': book.genre.id,
+                'is_deleted': book.is_deleted,
+                'delete_text': book.delete_text,
+                'is_available': book.is_available
+            }
+            book_data.append(book_info)
+        return Response(book_data, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
@@ -242,6 +365,20 @@ def genres_list_create(request):
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
+        image_data = data.get('icon_path')
+
+        # Декодируем изображение из base64
+        image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+        # Сохраняем изображение в формате PNG
+        buffer = io.BytesIO()
+        image.save(buffer, format='PNG')
+
+        # Получаем байтовое представление изображения
+        image_png = buffer.getvalue()
+
+        # Модифицируем данные, чтобы сохранить байтовое представление изображения
+        data['icon_path'] = base64.b64encode(image_png).decode('utf-8')
         serializer = GenreSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -262,6 +399,20 @@ def genres_detail(request, pk):
 
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
+        image_data = data.get('icon_path')
+
+        # Декодируем изображение из base64
+        image = Image.open(io.BytesIO(base64.b64decode(image_data)))
+
+        # Сохраняем изображение в формате PNG
+        buffer = io.BytesIO()
+        image.save(buffer, format='PNG')
+
+        # Получаем байтовое представление изображения
+        image_png = buffer.getvalue()
+
+        # Модифицируем данные, чтобы сохранить байтовое представление изображения
+        data['icon_path'] = base64.b64encode(image_png).decode('utf-8')
         serializer = GenreSerializer(genre, data=data)
         if serializer.is_valid():
             serializer.save()
@@ -281,11 +432,24 @@ def userbooks_list_create(request):
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer = UserBooksSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        book_id = data.get('book')
+        user_id = data.get('user')
+
+        try:
+            user_book = UserBooks.objects.get(book_id=book_id, user_id=user_id)
+            if not user_book.is_active:
+                user_book.is_active = True
+                user_book.save()
+                serializer = UserBooksSerializer(user_book)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'User book already exists and is active'}, status=status.HTTP_400_BAD_REQUEST)
+        except UserBooks.DoesNotExist:
+            serializer = UserBooksSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])

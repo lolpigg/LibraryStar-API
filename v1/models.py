@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.core.validators import FileExtensionValidator
 class Action(models.Model):
     name = models.CharField(max_length=50)
 
@@ -15,7 +15,6 @@ class Author(models.Model):
     image_path = models.ImageField(upload_to='img/authors/', null=True)
     year_of_birth = models.IntegerField()
     year_of_death = models.IntegerField(null=True)
-    literary_direction = models.ForeignKey('Direction', on_delete=models.CASCADE)
 
 class AuthorBooks(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
@@ -26,7 +25,7 @@ class Book(models.Model):
     description = models.CharField(max_length=300, default="Описания нет.")
     year_of_creating = models.IntegerField()
     image_path = models.ImageField(upload_to='img/books/')
-    pdf_path = models.FileField(upload_to='pdf/')
+    pdf_path = models.TextField()
     publisher = models.ForeignKey('User', on_delete=models.CASCADE)
     genre = models.ForeignKey('Genre', on_delete=models.CASCADE)
     is_deleted = models.BooleanField()
