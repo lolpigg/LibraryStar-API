@@ -24,13 +24,12 @@ class NotificationForm(forms.ModelForm):
 class AuthorForm(forms.ModelForm):
     class Meta:
         model = Author
-        fields = ['full_name', 'image_path', 'year_of_birth', 'year_of_death', 'literary_direction']
+        fields = ['full_name', 'image_path', 'year_of_birth', 'year_of_death', ]
         labels = {
             'full_name': 'ФИО',
             'image_path': 'Фотография',
             'year_of_birth': 'Год рождения',
             'year_of_death': 'Год смерти',
-            'literary_direction': 'Литературное направление'
         }
 
 class AuthorBooksForm(forms.ModelForm):
